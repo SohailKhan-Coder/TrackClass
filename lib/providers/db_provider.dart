@@ -7,8 +7,11 @@ import '../models/attendance_model.dart';
 import '../services/db_helper.dart';
 
 class DBProvider with ChangeNotifier {
+  // ------------------- DB Helper -------------------
   final DBHelper _dbHelper = DBHelper();
+  DBHelper get dbHelper => _dbHelper; // <-- Add getter for BackupRestoreService
 
+  // ------------------- State -------------------
   List<Section> _sections = [];
   List<Student> _students = [];
   List<Attendance> _dailyAttendance = [];
@@ -16,19 +19,19 @@ class DBProvider with ChangeNotifier {
   int? _currentSectionId;
   DateTime _selectedDate = DateTime.now();
 
-  // Getters
+  // ------------------- Getters -------------------
   List<Section> get sections => _sections;
   List<Student> get students => _students;
   int? get currentSectionId => _currentSectionId;
   List<Attendance> get dailyAttendance => _dailyAttendance;
+  List<Attendance> get allAttendance => _allAttendance;
   DateTime get selectedDate => _selectedDate;
   String get selectedDateString =>
       DateFormat('yyyy-MM-dd').format(_selectedDate);
-  List<Attendance> get allAttendance => _allAttendance;
 
-  // ============================
+  // =========================
   // SECTION & STUDENT MANAGEMENT
-  // ============================
+  // =========================
 
   Future<void> initializeSections() async {
     _sections = await _dbHelper.getSections();
@@ -88,43 +91,36 @@ class DBProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // Call this from UI to update a student
   Future<void> updateStudent(Student student) async {
     if (student.id == null) return;
     await _dbHelper.updateStudent(student);
-    // Refresh local lists so UI reflects the change immediately
     await loadStudentsForCurrentSection();
     await loadAttendanceForDate();
     await loadAllAttendance();
     notifyListeners();
   }
 
-
   // ====================
   // DATE MANAGEMENT
   // ====================
-
   Future<void> setDate(DateTime date) async {
     _selectedDate = date;
     await loadAttendanceForDate();
     notifyListeners();
   }
 
-  // ============================
+  // =========================
   // ATTENDANCE MANAGEMENT
-  // ============================
-
+  // =========================
   Future<void> loadAllAttendance() async {
     if (_currentSectionId == null) return;
     _allAttendance = await _dbHelper.getAttendanceBySection(_currentSectionId!);
-    notifyListeners(); // 🔥 important for StatisticsTab
+    notifyListeners();
   }
 
   Future<void> loadAttendanceForDate({bool createMissingRecords = true}) async {
     if (_currentSectionId == null) return;
-
     final dateStr = DateFormat('yyyy-MM-dd').format(_selectedDate);
-
     _dailyAttendance =
     await _dbHelper.getAttendanceByDate(dateStr, _currentSectionId!);
 
@@ -140,8 +136,6 @@ class DBProvider with ChangeNotifier {
             manzil: 0,
             revision: 0,
           );
-
-          // 🔥 FIX: get inserted ID
           final newId = await _dbHelper.insertAttendance(newRecord);
           _dailyAttendance.add(newRecord.copyWith(id: newId));
         }
@@ -182,8 +176,7 @@ class DBProvider with ChangeNotifier {
       _toggleField(studentId, 'manzil', value);
   void toggleRevision(int studentId, bool value) =>
       _toggleField(studentId, 'revision', value);
-
-  // ============================
+// ============================
   // FILTER & STATS HELPERS
   // ============================
 
@@ -293,48 +286,9 @@ class DBProvider with ChangeNotifier {
 
     return missing;
   }
-
-  Map<String, int> getStudentStatistics(String period) {
-    DateTime now = DateTime.now();
-    DateTime start;
-    DateTime end = now;
-
-    switch (period) {
-      case "Daily":
-        start = now;
-        break;
-      case "Weekly":
-        start = now.subtract(Duration(days: now.weekday - 1));
-        break;
-      case "Monthly":
-        start = DateTime(now.year, now.month, 1);
-        break;
-      case "Yearly":
-        start = DateTime(now.year, 1, 1);
-        break;
-      default:
-        start = now;
-    }
-
-    final recordsInRange = _allAttendance.where((a) {
-      final recordDate = DateTime.parse(a.date);
-      return recordDate.isAfter(start.subtract(const Duration(days: 1))) &&
-          recordDate.isBefore(end.add(const Duration(days: 1)));
-    }).toList();
-
-    return {
-      "present": recordsInRange.where((a) => a.present == 1).length,
-      "lesson": recordsInRange.where((a) => a.lesson == 1).length,
-      "sabqi": recordsInRange.where((a) => a.sabqi == 1).length,
-      "manzil": recordsInRange.where((a) => a.manzil == 1).length,
-      "revision": recordsInRange.where((a) => a.revision == 1).length,
-    };
-  }
-
-  // ============================
+  // =========================
   // LESSON DETAILS
-  // ============================
-
+  // =========================
   Future<bool> saveLessonDetails(
       int studentId, String details, String columnName) async {
     try {
@@ -348,7 +302,6 @@ class DBProvider with ChangeNotifier {
       );
 
       Map<String, dynamic> values = {};
-
       switch (columnName) {
         case "Lesson":
           values['lesson'] = 1;
@@ -374,8 +327,7 @@ class DBProvider with ChangeNotifier {
         await db.insert('attendance', values);
       } else {
         final id = result.first['id'] as int;
-        await db.update('attendance', values,
-            where: 'id = ?', whereArgs: [id]);
+        await db.update('attendance', values, where: 'id = ?', whereArgs: [id]);
       }
 
       await loadAllAttendance();
@@ -387,10 +339,9 @@ class DBProvider with ChangeNotifier {
     }
   }
 
-  // ============================
-  // OTHER HELPERS
-  // ============================
-
+  // =========================
+  // ATTENDANCE HELPERS
+  // =========================
   Future<List<Attendance>> fetchAttendanceForStudent(int studentId,
       [DateTime? date]) async {
     final String? dateStr =
@@ -403,8 +354,7 @@ class DBProvider with ChangeNotifier {
       int studentId, DateTime start, DateTime end) async {
     final startStr = DateFormat('yyyy-MM-dd').format(start);
     final endStr = DateFormat('yyyy-MM-dd').format(end);
-    return await _dbHelper.getAttendanceByStudentAndRange(
-        studentId, startStr, endStr);
+    return await _dbHelper.getAttendanceByStudentAndRange(studentId, startStr, endStr);
   }
 
   Future<void> deleteAttendance(int id) async {
@@ -477,10 +427,9 @@ class DBProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // ============================
-  // PREFS
-  // ============================
-
+  // =========================
+  // SHARED PREFS
+  // =========================
   Future<void> _saveCurrentSectionId() async {
     final prefs = await SharedPreferences.getInstance();
     if (_currentSectionId != null) {
@@ -492,4 +441,30 @@ class DBProvider with ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     _currentSectionId = prefs.getInt('currentSectionId');
   }
+
+  /// Backwards-compatible loader: loads sections and then refreshes students/attendance
+  Future<void> loadSections() async {
+    _sections = await _dbHelper.getSections();
+
+    // If currentSectionId is missing or no longer present, pick the first section
+    final hasCurrent = _currentSectionId != null && _sections.any((s) => s.id == _currentSectionId);
+    if (!hasCurrent && _sections.isNotEmpty) {
+      _currentSectionId = _sections.first.id;
+      await _saveCurrentSectionId();
+    }
+
+    // Refresh dependent state
+    await loadStudentsForCurrentSection();
+    await loadAttendanceForDate();
+    await loadAllAttendance();
+    notifyListeners();
+  }
+
+  /// Preferred method to fully reload app data after restore
+  Future<void> reloadAllData() async {
+    // initializeSections already handles creating default sections and loads students/attendance
+    await initializeSections();
+    notifyListeners();
+  }
+
 }

@@ -3,9 +3,10 @@ import 'package:provider/provider.dart';
 import 'package:students_registeration_app/providers/db_provider.dart';
 import 'package:students_registeration_app/views/attantance_register/tabs/StatisticsTab.dart';
 import 'package:students_registeration_app/views/attantance_register/tabs/StudentManagementTab.dart';
+import 'package:students_registeration_app/views/attantance_register/tabs/backup_restore_tab.dart';
 import 'package:students_registeration_app/views/attantance_register/tabs/attandance_tab.dart';
 import 'package:students_registeration_app/views/attantance_register/tabs/open_slide_menu.dart';
-import 'package:students_registeration_app/views/student_amount_view.dart';
+import 'package:students_registeration_app/views/attantance_register/tabs/student_amount_tab.dart';
 import '../../models/section_model.dart';
 
 class AttendanceRegisterView extends StatefulWidget {
@@ -22,11 +23,9 @@ class _AttendanceRegisterViewState extends State<AttendanceRegisterView> {
   void initState() {
     super.initState();
 
-    // Delay provider calls until after the first frame
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final provider = Provider.of<DBProvider>(context, listen: false);
 
-      // Set default section if none selected
       if (provider.currentSectionId == null && provider.sections.isNotEmpty) {
         provider.setCurrentSection(provider.sections.first.id!);
       }
@@ -38,7 +37,7 @@ class _AttendanceRegisterViewState extends State<AttendanceRegisterView> {
     return Scaffold(
       appBar: AppBar(
         actions: [
-          IconButton(onPressed: ()=> SideMenu.show(context), icon: Icon(Icons.menu))
+          IconButton(onPressed: () => SideMenu.show(context), icon: const Icon(Icons.menu))
         ],
         title: const Text("Attendance & Lesson Registration"),
       ),
@@ -56,7 +55,6 @@ class _AttendanceRegisterViewState extends State<AttendanceRegisterView> {
                   return const Text("No sections available");
                 }
 
-                // Find selected section by id
                 final selected = sections.firstWhere(
                       (s) => s.id == currentId,
                   orElse: () => sections.first,
@@ -64,26 +62,44 @@ class _AttendanceRegisterViewState extends State<AttendanceRegisterView> {
 
                 return DropdownButtonFormField<Section>(
                   decoration: InputDecoration(
+                    labelText: "Select Section",
+                    prefixIcon: const Icon(Icons.class_, color: Colors.indigo),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(25),
                     ),
-                    labelText: "Select Section",
-                  ),
-                  value: selected,
-                  items: sections
-                      .map(
-                        (section) => DropdownMenuItem<Section>(
-                      value: section,
-                      child: Text(section.name),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(25),
+                      borderSide: const BorderSide(color: Colors.indigo, width: 1),
                     ),
-                  )
-                      .toList(),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(25),
+                      borderSide: const BorderSide(color: Colors.indigo, width: 2),
+                    ),
+                  ),
+                  dropdownColor: Colors.white,
+                  isExpanded: true,
+                  value: selected,
+                  items: sections.map(
+                        (section) {
+                      return DropdownMenuItem<Section>(
+                        value: section,
+                        child: Text(
+                          section.name,
+                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                        ),
+                      );
+                    },
+                  ).toList(),
                   onChanged: (value) {
                     if (value != null) {
                       provider.setCurrentSection(value.id!);
                     }
                   },
+                  validator: (value) =>
+                  value == null ? "Please select a section" : null,
                 );
+
               },
             ),
 
@@ -100,7 +116,9 @@ class _AttendanceRegisterViewState extends State<AttendanceRegisterView> {
                   const SizedBox(width: 10),
                   _buildChoiceChip("Student Management"),
                   const SizedBox(width: 10),
-                  _buildChoiceChip("Student Lesson Details"),
+                  _buildChoiceChip("Amount Details"),
+                  const SizedBox(width: 10),
+                  _buildChoiceChip("App Settings"), // ⚡ new tab
                 ],
               ),
             ),
@@ -148,8 +166,10 @@ class _AttendanceRegisterViewState extends State<AttendanceRegisterView> {
         return const StatisticsTab();
       case "Student Management":
         return const StudentManagementTab();
-      case "Student Lesson Details":
+      case "Amount Details":
         return StudentAmountView();
+      case "App Settings":
+        return const BackupRestorePage();// ⚡ new tab content
       default:
         return const SizedBox();
     }

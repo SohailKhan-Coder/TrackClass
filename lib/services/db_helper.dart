@@ -289,4 +289,48 @@ class DBHelper {
     );
     return result.map((e) => Attendance.fromMap(e)).toList();
   }
+  // ---------------- JSON Export/Import ----------------
+  Future<Map<String, dynamic>> exportToJson() async {
+    final db = await database;
+
+    final sections = await db.query('sections');
+    final students = await db.query('students');
+    final attendance = await db.query('attendance');
+
+    return {
+      'sections': sections,
+      'students': students,
+      'attendance': attendance,
+    };
+  }
+
+  Future<void> importFromJson(Map<String, dynamic> data) async {
+    final db = await database;
+
+    // clear existing tables
+    await db.delete('attendance');
+    await db.delete('students');
+    await db.delete('sections');
+
+    // restore sections
+    if (data['sections'] != null) {
+      for (var sec in data['sections']) {
+        await db.insert('sections', Map<String, dynamic>.from(sec));
+      }
+    }
+
+    // restore students
+    if (data['students'] != null) {
+      for (var stu in data['students']) {
+        await db.insert('students', Map<String, dynamic>.from(stu));
+      }
+    }
+
+    // restore attendance
+    if (data['attendance'] != null) {
+      for (var att in data['attendance']) {
+        await db.insert('attendance', Map<String, dynamic>.from(att));
+      }
+    }
+  }
 }

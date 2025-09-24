@@ -1,8 +1,8 @@
+import 'package:external_app_launcher/external_app_launcher.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/components/lesson_dialog.dart';
 import '../../../models/attendance_model.dart';
@@ -19,6 +19,38 @@ class AttendanceTab extends StatefulWidget {
 class _AttendanceTabState extends State<AttendanceTab> {
   final TextEditingController _studentController = TextEditingController();
   DateTime selectedDate = DateTime.now();
+  Future<void> openWhatsApp(BuildContext context, String phone,
+      {String message = "Hello!"}) async {
+    if (phone.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Phone number not available')),
+      );
+      return;
+    }
+
+    final cleanPhone = phone.replaceAll("+", "").replaceAll(" ", "");
+    final encodedMessage = Uri.encodeComponent(message);
+    final waUrl = Uri.parse("https://wa.me/$cleanPhone?text=$encodedMessage");
+
+    try {
+      await LaunchApp.openApp(
+        androidPackageName: "com.whatsapp",
+        openStore: false,
+      );
+
+
+      await launchUrl(waUrl, mode: LaunchMode.externalApplication);
+    } catch (e) {
+
+      if (await canLaunchUrl(waUrl)) {
+        await launchUrl(waUrl, mode: LaunchMode.externalApplication);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Could not open WhatsApp')),
+        );
+      }
+    }
+  }
 
   Future<void> _pickDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -31,7 +63,7 @@ class _AttendanceTabState extends State<AttendanceTab> {
       setState(() {
         selectedDate = picked;
       });
-      // Update provider with new date
+
       final provider = Provider.of<DBProvider>(context, listen: false);
       provider.setDate(picked);
     }
@@ -165,6 +197,9 @@ class _AttendanceTabState extends State<AttendanceTab> {
                                 }
                                     : null,
                               ),
+                              if(attendance.lesson == 0)
+                                Text("Amount"),
+                              if(attendance.lesson == 1)
                               TextButton(
                                 child: Text("Amount"),
                                 onPressed: () {
@@ -192,6 +227,9 @@ class _AttendanceTabState extends State<AttendanceTab> {
                                 }
                                     : null,
                               ),
+                              if(attendance.sabqi == 0)
+                                Text("Amount"),
+                              if(attendance.sabqi == 1)
                               TextButton(
                                 child: Text("Amount"),
                                 onPressed: () {
@@ -218,6 +256,9 @@ class _AttendanceTabState extends State<AttendanceTab> {
                                 }
                                     : null,
                               ),
+                              if(attendance.manzil == 0)
+                                Text("Amount"),
+                              if(attendance.manzil == 1)
                               TextButton(
                                 child: Text("Amount"),
                                 onPressed: () {
@@ -244,6 +285,9 @@ class _AttendanceTabState extends State<AttendanceTab> {
                                 }
                                     : null,
                               ),
+                              if(attendance.revision == 0)
+                                Text("Amount"),
+                              if(attendance.revision == 1)
                               TextButton(
                                 child: Text("Amount"),
                                 onPressed: () {
@@ -256,27 +300,18 @@ class _AttendanceTabState extends State<AttendanceTab> {
                                 },
                               ),
                               IconButton(
+                                icon: const FaIcon(FontAwesomeIcons.whatsapp, color: Colors.green),
                                 onPressed: () async {
                                   if (student.phone != null && student.phone!.isNotEmpty) {
-                                    // WhatsApp URL
-                                    final whatsappUrl = "https://wa.me/${student.phone}?text=Hello!";
-
-                                    final uri = Uri.parse(whatsappUrl);
-                                    if (await canLaunchUrl(uri)) {
-                                      await launchUrl(uri, mode: LaunchMode.externalApplication);
-                                    } else {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(content: Text('Could not open WhatsApp')),
-                                      );
-                                    }
+                                    await openWhatsApp(context, student.phone!, message: "Hello ${student.name} 👋");
                                   } else {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(content: Text('Phone number not available')),
                                     );
                                   }
                                 },
-                                icon: const FaIcon(FontAwesomeIcons.whatsapp,color: Colors.green,),
-                              )
+                              ),
+
                             ],
                           )),
 

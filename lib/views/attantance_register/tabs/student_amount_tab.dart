@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:students_registeration_app/views/student_details%20view.dart';
-import '../../models/students_model.dart';
-import '../../providers/db_provider.dart';
+import '../../../../models/students_model.dart';
+import '../../../../providers/db_provider.dart';
 
 class StudentAmountView extends StatelessWidget {
   const StudentAmountView({super.key});

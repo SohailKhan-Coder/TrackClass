@@ -8,6 +8,7 @@ class CustomTextField extends StatelessWidget {
   final bool obscureText;
   final ValueChanged<String>? onChanged;
   final TextInputType? keyboardType;
+  final String? Function(String?)? validator;
 
   const CustomTextField({
     super.key,
@@ -17,36 +18,37 @@ class CustomTextField extends StatelessWidget {
     this.obscureText = false,
     this.labelText,
     this.onChanged,
-    this.keyboardType
-
-
+    this.keyboardType,
+    this.validator,
   });
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
+    return TextFormField(
       keyboardType: keyboardType,
       obscureText: obscureText,
       controller: controller,
       decoration: InputDecoration(
-        contentPadding: EdgeInsets.symmetric(vertical: 10),
+        contentPadding: const EdgeInsets.symmetric(vertical: 10),
         hintText: hintText,
-
         hintStyle: TextStyle(color: Colors.grey[700]),
         labelText: labelText,
-        prefixIcon: prefixIcon != null ? Icon(prefixIcon,color: Colors.indigo,) : null,
+        prefixIcon: prefixIcon != null
+            ? Icon(prefixIcon, color: Colors.indigo)
+            : null,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(25)
+          borderRadius: BorderRadius.circular(25),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(25),
-          borderSide: BorderSide(color: Colors.indigo,width: 1)
+          borderSide: const BorderSide(color: Colors.indigo, width: 1),
         ),
         focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(25)
-        )
+          borderRadius: BorderRadius.circular(25),
+        ),
       ),
       onChanged: onChanged,
+      validator: validator,
     );
   }
 }
