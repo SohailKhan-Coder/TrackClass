@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:students_registeration_app/core/constants/app_theme.dart';
+import 'bottom_navigator_bar_view.dart';
 import 'providers/db_provider.dart';
-import 'views/attantance_register/attendance_register_view.dart';
+
+
+
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,7 +27,7 @@ class StudentsDetailApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       title: 'Attendance Register',
-      home: const AttendanceRegisterView(),
+      home: const MainView(),
     );
   }
 }

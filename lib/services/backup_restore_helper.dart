@@ -4,7 +4,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:intl/intl.dart';
 import '../providers/db_provider.dart';
 import '../services/db_helper.dart';
@@ -12,7 +11,7 @@ import '../services/db_helper.dart';
 class BackupHelper {
   final DBHelper _dbHelper = DBHelper();
 
-  /// 📦 Backup to JSON (saved in Downloads/MyAppBackup)
+  /// Backup to JSON (saved in Downloads/MyAppBackup)
   Future<File> backupToJson() async {
     final data = await _dbHelper.exportToJson();
     final jsonString = const JsonEncoder.withIndent('  ').convert(data);
@@ -29,7 +28,7 @@ class BackupHelper {
     return file;
   }
 
-  /// 🔄 Restore from JSON file
+  /// Restore from JSON file
   Future<void> restoreFromJson(File file, BuildContext context) async {
     final db = await _dbHelper.database;
     final content = await file.readAsString();
@@ -51,18 +50,18 @@ class BackupHelper {
       await db.insert('attendance', Map<String, dynamic>.from(att));
     }
 
-    // ✅ Refresh Provider
+
     final provider = Provider.of<DBProvider>(context, listen: false);
     await provider.reloadAllData();
 
     // Show success
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("✅ Data restored successfully")),
+      const SnackBar(content: Text("Data restored successfully")),
     );
   }
 
-  /// 📤 Share backup via WhatsApp/Email/etc
+
   Future<void> shareBackup(File file) async {
-    await Share.shareXFiles([XFile(file.path)], text: '📦 MyApp Backup File');
+    await Share.shareXFiles([XFile(file.path)], text: 'MyApp Backup File');
   }
 }

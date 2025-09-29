@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:students_registeration_app/providers/db_provider.dart';
-import 'package:students_registeration_app/views/attantance_register/tabs/StatisticsTab.dart';
-import 'package:students_registeration_app/views/attantance_register/tabs/StudentManagementTab.dart';
-import 'package:students_registeration_app/views/attantance_register/tabs/backup_restore_tab.dart';
+import 'package:students_registeration_app/views/attantance_register/tabs/Statistics_tab.dart';
+import 'package:students_registeration_app/views/attantance_register/tabs/Student_management_tab.dart';
+
 import 'package:students_registeration_app/views/attantance_register/tabs/attandance_tab.dart';
 import 'package:students_registeration_app/views/attantance_register/tabs/open_slide_menu.dart';
-import 'package:students_registeration_app/views/attantance_register/tabs/student_amount_tab.dart';
+
 import '../../models/section_model.dart';
 
 class AttendanceRegisterView extends StatefulWidget {
@@ -39,7 +40,7 @@ class _AttendanceRegisterViewState extends State<AttendanceRegisterView> {
         actions: [
           IconButton(onPressed: () => SideMenu.show(context), icon: const Icon(Icons.menu))
         ],
-        title: const Text("Attendance & Lesson Registration"),
+        title: Text("Attendance & Lesson Registration",style: GoogleFonts.aclonica(fontSize: 15,fontWeight: FontWeight.bold),),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -116,9 +117,6 @@ class _AttendanceRegisterViewState extends State<AttendanceRegisterView> {
                   const SizedBox(width: 10),
                   _buildChoiceChip("Student Management"),
                   const SizedBox(width: 10),
-                  _buildChoiceChip("Amount Details"),
-                  const SizedBox(width: 10),
-                  _buildChoiceChip("App Settings"), // ⚡ new tab
                 ],
               ),
             ),
@@ -166,10 +164,6 @@ class _AttendanceRegisterViewState extends State<AttendanceRegisterView> {
         return const StatisticsTab();
       case "Student Management":
         return const StudentManagementTab();
-      case "Amount Details":
-        return StudentAmountView();
-      case "App Settings":
-        return const BackupRestorePage();// ⚡ new tab content
       default:
         return const SizedBox();
     }

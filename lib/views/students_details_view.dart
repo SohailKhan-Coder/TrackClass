@@ -58,6 +58,7 @@ class _StudentDetailsViewState extends State<StudentDetailsView> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text("Update Attendance"),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         content: SingleChildScrollView(
           child: Column(
             children: [
@@ -69,8 +70,11 @@ class _StudentDetailsViewState extends State<StudentDetailsView> {
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel")),
-          ElevatedButton(
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cancel"),
+          ),
+          ElevatedButton.icon(
             onPressed: () async {
               final updated = att.copyWith(
                 lessonQuantity: lessonController.text,
@@ -78,14 +82,15 @@ class _StudentDetailsViewState extends State<StudentDetailsView> {
                 manzilQuantity: manzilController.text,
                 revisionQuantity: revisionController.text,
               );
-
-              await provider.updateAttendance(updated); // updates DB & provider list
+              await provider.updateAttendance(updated);
+              if (!mounted) return;
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text("Attendance updated"), backgroundColor: Colors.green),
               );
             },
-            child: const Text("Update"),
+            icon: const Icon(Icons.check),
+            label: const Text("Update"),
           ),
         ],
       ),
@@ -97,47 +102,65 @@ class _StudentDetailsViewState extends State<StudentDetailsView> {
     return Consumer<DBProvider>(
       builder: (context, provider, child) {
         return Scaffold(
-          appBar: AppBar(title: Text("${widget.student.name} Details")),
+          appBar: AppBar(
+            title: Text("${widget.student.name} Details"),
+            centerTitle: true,
+            backgroundColor: Colors.indigo,
+            elevation: 4,
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
+            ),
+          ),
+
           body: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Student info
+              // Student Info Card
               Container(
-                width: double.infinity,
-                color: Colors.blue.shade50,
-                padding: const EdgeInsets.all(12),
+                margin: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.indigo.shade50,
+                  borderRadius: BorderRadius.circular(20),
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("Student: ${widget.student.name}", style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    Text(widget.student.name,
+                        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 4),
+                    if (widget.student.phone != null)
+                      Text("📞 ${widget.student.phone}"),
                     if (widget.student.sectionId != null)
-                      Text("Section: ${widget.student.sectionId}", style: const TextStyle(fontSize: 16)),
+                      Text("Section: ${widget.student.sectionId}"),
                   ],
                 ),
               ),
-              const SizedBox(height: 8),
 
-              // Date filters
+              // Date Filters
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: Row(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: Wrap(
+                  spacing: 10,
                   children: [
-                    ElevatedButton(
-                      onPressed: () => _pickDate(context),
-                      child: Text(selectedDate == null
+                    ActionChip(
+                      avatar: const Icon(Icons.date_range),
+                      label: Text(selectedDate == null
                           ? "Pick Date"
                           : DateFormat('dd/MM/yyyy').format(selectedDate!)),
+                      onPressed: () => _pickDate(context),
                     ),
-                    const SizedBox(width: 10),
-                    ElevatedButton(
-                      onPressed: () => _pickRange(context),
-                      child: Text(selectedRange == null
+                    ActionChip(
+                      avatar: const Icon(Icons.calendar_month),
+                      label: Text(selectedRange == null
                           ? "Pick Range"
                           : "${DateFormat('dd/MM').format(selectedRange!.start)} - ${DateFormat('dd/MM/yyyy').format(selectedRange!.end)}"),
+                      onPressed: () => _pickRange(context),
                     ),
                     if (selectedDate != null || selectedRange != null)
-                      IconButton(
-                        icon: const Icon(Icons.clear),
+                      ActionChip(
+                        avatar: const Icon(Icons.clear, color: Colors.red),
+                        label: const Text("Clear"),
                         onPressed: () {
                           setState(() {
                             selectedDate = null;
@@ -150,7 +173,7 @@ class _StudentDetailsViewState extends State<StudentDetailsView> {
               ),
               const SizedBox(height: 8),
 
-              // Attendance list
+              // Attendance List
               Expanded(
                 child: FutureBuilder<List<Attendance>>(
                   future: selectedRange != null
@@ -171,24 +194,31 @@ class _StudentDetailsViewState extends State<StudentDetailsView> {
                         final att = records[index];
                         return Card(
                           margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          elevation: 3,
                           child: ListTile(
                             title: Text(
                               DateFormat('EEEE, dd MMM yyyy').format(DateTime.parse(att.date)),
                               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                             ),
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text("Present: ${att.present == 1 ? "Yes" : "No"}"),
-                                if ((att.lessonQuantity ?? "").isNotEmpty)
-                                  Text("Lesson: ${att.lessonQuantity}"),
-                                if ((att.sabqiQuantity ?? "").isNotEmpty)
-                                  Text("Sabqi: ${att.sabqiQuantity}"),
-                                if ((att.manzilQuantity ?? "").isNotEmpty)
-                                  Text("Manzil: ${att.manzilQuantity}"),
-                                if ((att.revisionQuantity ?? "").isNotEmpty)
-                                  Text("Revision: ${att.revisionQuantity}"),
-                              ],
+                            subtitle: Padding(
+                              padding: const EdgeInsets.only(top: 6),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text("Present: ${att.present == 1 ? "Yes" : "No"}"),
+                                  if ((att.lessonQuantity ?? "").isNotEmpty)
+                                    Text("Lesson: ${att.lessonQuantity}"),
+                                  if ((att.sabqiQuantity ?? "").isNotEmpty)
+                                    Text("Sabqi: ${att.sabqiQuantity}"),
+                                  if ((att.manzilQuantity ?? "").isNotEmpty)
+                                    Text("Manzil: ${att.manzilQuantity}"),
+                                  if ((att.revisionQuantity ?? "").isNotEmpty)
+                                    Text("Revision: ${att.revisionQuantity}"),
+                                ],
+                              ),
                             ),
                             trailing: Row(
                               mainAxisSize: MainAxisSize.min,

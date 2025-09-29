@@ -1,7 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
-
+import 'package:google_fonts/google_fonts.dart';
+import 'package:students_registeration_app/bottom_navigator_bar_view.dart';
 import '../../../services/backup_restore_helper.dart';
 
 class BackupRestorePage extends StatefulWidget {
@@ -22,12 +23,16 @@ class _BackupRestorePageState extends State<BackupRestorePage> {
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("✅ Backup saved at: ${file.path}")),
+        SnackBar(
+            backgroundColor: Colors.green,
+            content: Text("Backup saved at: ${file.path}")),
       );
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("❌ Backup failed: $e")),
+        SnackBar(
+            backgroundColor: Colors.red,
+            content: Text(" Backup failed: $e")),
       );
     }
     setState(() => _isLoading = false);
@@ -43,17 +48,18 @@ class _BackupRestorePageState extends State<BackupRestorePage> {
 
       if (result != null && result.files.single.path != null) {
         final file = File(result.files.single.path!);
-        await _backupHelper.restoreFromJson(file, context); // ✅ pass context
+        await _backupHelper.restoreFromJson(file, context); //
       }
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("❌ Restore failed: $e")),
+        SnackBar(
+            backgroundColor: Colors.red,
+            content: Text(" Restore failed: $e")),
       );
     }
     setState(() => _isLoading = false);
   }
-
 
   Future<void> _shareBackup() async {
     setState(() => _isLoading = true);
@@ -63,7 +69,9 @@ class _BackupRestorePageState extends State<BackupRestorePage> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("❌ Share failed: $e")),
+        SnackBar(
+          backgroundColor: Colors.red,
+            content: Text("Share failed: $e")),
       );
     }
     setState(() => _isLoading = false);
@@ -72,38 +80,115 @@ class _BackupRestorePageState extends State<BackupRestorePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-            color: Colors.blue[50],
-            borderRadius: BorderRadius.circular(25)
+      backgroundColor: const Color(0xFFF5F6FA),
+      appBar: AppBar(
+        title: Text("Backup & Restore",style: GoogleFonts.aclonica(fontSize: 20,fontWeight: FontWeight.bold),),
+        backgroundColor: Colors.indigo,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios),
+          onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context)=> MainView())),
         ),
-        child: Center(
-          child: _isLoading
-              ? const CircularProgressIndicator()
-              : Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text("Backup & Restore Data",style: TextStyle(fontSize: 20,color: Colors.indigo,fontWeight: FontWeight.bold),),
-              SizedBox(height: 50,),
+      ),
+      body: Center(
+        child: _isLoading
+            ? const CircularProgressIndicator()
+            : Padding(
+          padding: const EdgeInsets.all(20),
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: const [
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 8,
+                  offset: Offset(0, 3),
+                )
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  "Backup & Restore Data",
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.indigo,
+                  ),
+                ),
+                const SizedBox(height: 30),
 
-              ElevatedButton.icon(
-                onPressed: _backupData,
-                icon: const Icon(Icons.backup),
-                label: const Text("Backup Data"),
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton.icon(
-                onPressed: _restoreData,
-                icon: const Icon(Icons.restore),
-                label: const Text("Restore Data"),
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton.icon(
-                onPressed: _shareBackup,
-                icon: const Icon(Icons.share),
-                label: const Text("Share Backup"),
-              ),
-            ],
+                /// Backup Button + text
+                ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.indigo,
+                    foregroundColor: Colors.white,
+                    minimumSize: const Size(double.infinity, 50),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  onPressed: _backupData,
+                  icon: const Icon(Icons.backup),
+                  label: const Text("Backup Data"),
+                ),
+                const SizedBox(height: 6),
+                const Text(
+                  "Save all your student records into a JSON file for safekeeping.",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 14, color: Colors.black54),
+                ),
+
+                const SizedBox(height: 25),
+
+                /// Restore Button + text
+                ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    foregroundColor: Colors.white,
+                    minimumSize: const Size(double.infinity, 50),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  onPressed: _restoreData,
+                  icon: const Icon(Icons.restore),
+                  label: const Text("Restore Data"),
+                ),
+                const SizedBox(height: 6),
+                const Text(
+                  "Restore data from a previously saved backup file.",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 14, color: Colors.black54),
+                ),
+
+                const SizedBox(height: 25),
+
+                /// Share Button + text
+                ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.orange,
+                    foregroundColor: Colors.white,
+                    minimumSize: const Size(double.infinity, 50),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  onPressed: _shareBackup,
+                  icon: const Icon(Icons.share),
+                  label: const Text("Share Backup"),
+                ),
+                const SizedBox(height: 6),
+                const Text(
+                  "Easily share your backup file via email, WhatsApp, or other apps.",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 14, color: Colors.black54),
+                ),
+              ],
+            ),
           ),
         ),
       ),
