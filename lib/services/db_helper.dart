@@ -60,7 +60,6 @@ class DBHelper {
           )
         ''');
       },
-      // sanitize any existing NULLs when DB opens (helps if old rows contain NULL)
       onOpen: (db) async {
         await db.rawUpdate('''
           UPDATE attendance
@@ -78,7 +77,7 @@ class DBHelper {
     );
   }
 
-  // ---------------- Sections ----------------
+
   Future<int> insertSection(Section section) async {
     final db = await database;
     return await db.insert('sections', section.toMap());
@@ -90,7 +89,7 @@ class DBHelper {
     return result.map((e) => Section.fromMap(e)).toList();
   }
 
-  // ---------------- Students ----------------
+
   Future<int> insertStudent(Student student) async {
     final db = await database;
     return await db.insert('students', student.toMap());
@@ -111,15 +110,14 @@ class DBHelper {
     return await db.delete('students', where: 'id = ?', whereArgs: [id]);
   }
 
-  // Update an existing student
+
   Future<int> updateStudent(Student student) async {
     final db = await database;
     if (student.id == null) {
       throw Exception('Student.id is null — cannot update without id.');
     }
 
-    // Ensure your Student.toMap() uses the same column names as your DB:
-    // e.g. {'name': student.name, 'phone': student.phone, 'section_id': student.sectionId}
+
     return await db.update(
       'students',
       student.toMap(),
@@ -129,11 +127,11 @@ class DBHelper {
   }
 
 
-  // ---------------- Attendance ----------------
+
   Future<int> insertAttendance(Attendance attendance) async {
     final db = await database;
 
-    // build safe map (exclude id so sqlite autoincrements)
+
     final map = <String, dynamic>{
       'student_id': attendance.studentId,
       'date': attendance.date,
@@ -216,9 +214,7 @@ class DBHelper {
     return await db.update('attendance', values, where: 'id = ?', whereArgs: [id]);
   }
 
-  // ---------------- Queries ----------------
 
-  // Get attendance records for a specific date and section (joins students)
   Future<List<Attendance>> getAttendanceByDate(String date, int sectionId) async {
     final db = await database;
 
@@ -232,7 +228,7 @@ class DBHelper {
     return result.map((e) => Attendance.fromMap(e)).toList();
   }
 
-  // Get attendance records for a given student (all dates, newest first)
+
   Future<List<Attendance>> getAttendanceByStudent(int studentId) async {
     final db = await database;
     final result = await db.query(
@@ -244,7 +240,7 @@ class DBHelper {
     return result.map((e) => Attendance.fromMap(e)).toList();
   }
 
-  // Get attendance for a student optionally filtered by a single date
+
   Future<List<Attendance>> getAttendanceByStudentAndDate(int studentId, {String? date}) async {
     final db = await database;
 
@@ -266,7 +262,7 @@ class DBHelper {
     return result.map((e) => Attendance.fromMap(e)).toList();
   }
 
-  // Get attendance for a student between two dates (inclusive)
+
   Future<List<Attendance>> getAttendanceByStudentAndRange(
       int studentId, String startDate, String endDate) async {
     final db = await database;
@@ -279,7 +275,7 @@ class DBHelper {
     return maps.map((m) => Attendance.fromMap(m)).toList();
   }
 
-  // Get attendance for an entire section (all students in that section)
+
   Future<List<Attendance>> getAttendanceBySection(int sectionId) async {
     final db = await database;
     final result = await db.query(
@@ -289,7 +285,7 @@ class DBHelper {
     );
     return result.map((e) => Attendance.fromMap(e)).toList();
   }
-  // ---------------- JSON Export/Import ----------------
+
   Future<Map<String, dynamic>> exportToJson() async {
     final db = await database;
 
@@ -307,26 +303,26 @@ class DBHelper {
   Future<void> importFromJson(Map<String, dynamic> data) async {
     final db = await database;
 
-    // clear existing tables
+
     await db.delete('attendance');
     await db.delete('students');
     await db.delete('sections');
 
-    // restore sections
+
     if (data['sections'] != null) {
       for (var sec in data['sections']) {
         await db.insert('sections', Map<String, dynamic>.from(sec));
       }
     }
 
-    // restore students
+
     if (data['students'] != null) {
       for (var stu in data['students']) {
         await db.insert('students', Map<String, dynamic>.from(stu));
       }
     }
 
-    // restore attendance
+
     if (data['attendance'] != null) {
       for (var att in data['attendance']) {
         await db.insert('attendance', Map<String, dynamic>.from(att));

@@ -52,7 +52,7 @@ Future<void> showQuantityDialog(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Editable textfield with clear button
+
                   TextFormField(
                     controller: textController,
                     decoration: InputDecoration(
@@ -75,7 +75,7 @@ Future<void> showQuantityDialog(
                   ),
                   const SizedBox(height: 8),
 
-                  // Number controls
+
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -204,7 +204,7 @@ Future<void> showQuantityDialog(
                       bool success = await provider.saveLessonDetails(
                         studentSno,
                         text,
-                        columnName, // FIXED ✅ (was studentName)
+                        columnName,
                       );
 
                       Navigator.pop(context);

@@ -6,7 +6,7 @@ import 'package:students_registeration_app/views/attantance_register/tabs/Statis
 import 'package:students_registeration_app/views/attantance_register/tabs/Student_management_tab.dart';
 
 import 'package:students_registeration_app/views/attantance_register/tabs/attandance_tab.dart';
-import 'package:students_registeration_app/views/attantance_register/tabs/open_slide_menu.dart';
+import 'package:students_registeration_app/views/open_slide_menu.dart';
 
 import '../../models/section_model.dart';
 
@@ -37,16 +37,16 @@ class _AttendanceRegisterViewState extends State<AttendanceRegisterView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         actions: [
           IconButton(onPressed: () => SideMenu.show(context), icon: const Icon(Icons.menu))
         ],
-        title: Text("Attendance & Lesson Registration",style: GoogleFonts.aclonica(fontSize: 15,fontWeight: FontWeight.bold),),
+        title: Text("Attendance & Lesson Registration",style: GoogleFonts.abrilFatface(fontSize: 18,fontWeight: FontWeight.w500),),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            /// Dropdown for Sections
             Consumer<DBProvider>(
               builder: (context, provider, child) {
                 final sections = provider.sections;
@@ -106,7 +106,7 @@ class _AttendanceRegisterViewState extends State<AttendanceRegisterView> {
 
             const SizedBox(height: 12),
 
-            /// Choice Chips (Tabs)
+
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
@@ -122,7 +122,7 @@ class _AttendanceRegisterViewState extends State<AttendanceRegisterView> {
             ),
             const SizedBox(height: 20),
 
-            /// Tab content
+
             Expanded(child: getTabContent()),
           ],
         ),
@@ -130,7 +130,7 @@ class _AttendanceRegisterViewState extends State<AttendanceRegisterView> {
     );
   }
 
-  /// ChoiceChip builder
+
   Widget _buildChoiceChip(String label) {
     return ChoiceChip(
       label: Text(
@@ -155,7 +155,6 @@ class _AttendanceRegisterViewState extends State<AttendanceRegisterView> {
     );
   }
 
-  /// Returns the correct tab widget
   Widget getTabContent() {
     switch (selectedTab) {
       case "Attendance":

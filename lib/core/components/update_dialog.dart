@@ -38,7 +38,7 @@ Future<void> showUpdateAttendanceDialog(
               revisionQuantity: revisionController.text,
             );
 
-            await provider.updateAttendance(updated); // make sure method exists in DBProvider
+            await provider.updateAttendance(updated);
             Navigator.pop(context);
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text("Attendance updated")),

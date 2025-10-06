@@ -11,7 +11,6 @@ import '../services/db_helper.dart';
 class BackupHelper {
   final DBHelper _dbHelper = DBHelper();
 
-  /// Backup to JSON (saved in Downloads/MyAppBackup)
   Future<File> backupToJson() async {
     final data = await _dbHelper.exportToJson();
     final jsonString = const JsonEncoder.withIndent('  ').convert(data);
@@ -28,18 +27,15 @@ class BackupHelper {
     return file;
   }
 
-  /// Restore from JSON file
   Future<void> restoreFromJson(File file, BuildContext context) async {
     final db = await _dbHelper.database;
     final content = await file.readAsString();
     final data = jsonDecode(content);
 
-    // Clear tables
     await db.delete('attendance');
     await db.delete('students');
     await db.delete('sections');
 
-    // Insert data
     for (var sec in data['sections']) {
       await db.insert('sections', Map<String, dynamic>.from(sec));
     }
@@ -50,16 +46,13 @@ class BackupHelper {
       await db.insert('attendance', Map<String, dynamic>.from(att));
     }
 
-
     final provider = Provider.of<DBProvider>(context, listen: false);
     await provider.reloadAllData();
 
-    // Show success
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Data restored successfully")),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text("Data restored successfully")));
   }
-
 
   Future<void> shareBackup(File file) async {
     await Share.shareXFiles([XFile(file.path)], text: 'MyApp Backup File');

@@ -38,7 +38,7 @@ class SideMenu {
                         // Company Logo
                         Center(
                           child: Image.asset(
-                            'assets/images/company_logo.jpeg', // Replace with your actual logo
+                            'assets/images/company_logo.jpeg',
                             width: 100,
                             height: 100,
                           ),

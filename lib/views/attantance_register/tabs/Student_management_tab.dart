@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:students_registeration_app/core/utiles/validators.dart';
 import 'package:students_registeration_app/models/students_model.dart';
@@ -24,7 +25,7 @@ class _StudentManagementTabState extends State<StudentManagementTab> {
 
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFFF5F6FA), // light grey background
+        color: Colors.blue[50],
         borderRadius: BorderRadius.circular(25),
       ),
       child: SingleChildScrollView(
@@ -32,17 +33,16 @@ class _StudentManagementTabState extends State<StudentManagementTab> {
           key: _formKey,
           child: Column(
             children: [
-              /// Add Student Form
               Card(
                 child: Padding(
                   padding: const EdgeInsets.all(12.0),
                   child: Column(
                     children: [
                       const SizedBox(height: 15),
-                      const Text(
+                      Text(
                         "Students Management",
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold),
+                        style: GoogleFonts.abyssinicaSil(
+                            fontSize: 20, fontWeight: FontWeight.bold,color: Colors.indigo),
                       ),
                       const SizedBox(height: 10),
                       CustomTextField(
@@ -107,17 +107,15 @@ class _StudentManagementTabState extends State<StudentManagementTab> {
               ),
 
               const SizedBox(height: 15),
-
-              /// Students List
               Card(
                 child: Padding(
                   padding: const EdgeInsets.all(12.0),
                   child: Column(
                     children: [
-                      const Text(
+                      Text(
                         "Present Students List",
-                        style:
-                        TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        style: GoogleFonts.abyssinicaSil(
+                            fontSize: 18, fontWeight: FontWeight.bold,color: Colors.indigo),
                       ),
                       const SizedBox(height: 10),
                       CustomTextField(
@@ -135,7 +133,6 @@ class _StudentManagementTabState extends State<StudentManagementTab> {
                         builder: (context, provider, child) {
                           List<Student> students = provider.students;
 
-                          // Apply search filter
                           if (_searchController.text.isNotEmpty) {
                             students = students
                                 .where((s) => s.name
@@ -160,15 +157,15 @@ class _StudentManagementTabState extends State<StudentManagementTab> {
                                 child: ListTile(
                                   leading: const Icon(Icons.person,
                                       color: Colors.indigo),
-                                  title: Text(student.name),
-                                  subtitle: Text(student.phone ?? ""),
+                                  title: Text(student.name,style: GoogleFonts.adamina(color: Colors.black),),
+                                  subtitle: Text(student.phone ?? "",style: TextStyle(color: Colors.indigo),),
                                   trailing: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       /// Edit button
                                       IconButton(
                                         icon: const Icon(Icons.edit,
-                                            color: Colors.blue),
+                                            color: Colors.indigo),
                                         onPressed: () {
                                           _showEditDialog(context, student);
                                         },
@@ -202,7 +199,6 @@ class _StudentManagementTabState extends State<StudentManagementTab> {
     );
   }
 
-  /// Show edit dialog
   void _showEditDialog(BuildContext context, Student student) {
     final nameController = TextEditingController(text: student.name);
     final phoneController = TextEditingController(text: student.phone ?? "");

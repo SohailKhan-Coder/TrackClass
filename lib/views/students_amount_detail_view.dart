@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:students_registeration_app/views/students_amount_view.dart';
+import '../bottom_navigator_bar_view.dart';
 import '../core/components/show_delete_dialog.dart';
 import '../models/attendance_model.dart';
 import '../models/students_model.dart';
@@ -103,13 +106,12 @@ class _StudentDetailsViewState extends State<StudentDetailsView> {
       builder: (context, provider, child) {
         return Scaffold(
           appBar: AppBar(
-            title: Text("${widget.student.name} Details"),
+            leading: IconButton(onPressed: (){
+              Navigator.of(context).push(MaterialPageRoute(builder: (context)=>AppScaffold()));
+            }, icon: Icon(Icons.arrow_back_ios)),
+            title: Text("${widget.student.name} Details",style: GoogleFonts.abrilFatface(fontWeight: FontWeight.w500,fontSize: 20),),
             centerTitle: true,
             backgroundColor: Colors.indigo,
-            elevation: 4,
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
-            ),
           ),
 
           body: Column(
@@ -117,6 +119,7 @@ class _StudentDetailsViewState extends State<StudentDetailsView> {
             children: [
               // Student Info Card
               Container(
+                width: double.infinity,
                 margin: const EdgeInsets.all(12),
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -132,7 +135,7 @@ class _StudentDetailsViewState extends State<StudentDetailsView> {
                     if (widget.student.phone != null)
                       Text("📞 ${widget.student.phone}"),
                     if (widget.student.sectionId != null)
-                      Text("Section: ${widget.student.sectionId}"),
+                      Text("Section: ${widget.student.sectionId}",style: GoogleFonts.abhayaLibre(fontSize: 18,color: Colors.indigo,fontWeight: FontWeight.w500),),
                   ],
                 ),
               ),

@@ -9,13 +9,13 @@ class AppTheme {
       titleTextStyle: TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.bold,
-        color: Colors.white, // Explicitly set text color
+        color: Colors.white,
       ),
-      // You can also add other AppBarTheme properties
+
       elevation: 4,
       iconTheme: IconThemeData(color: Colors.white),
     ),
-    // You might also want to set other theme properties
+
     primaryColor: Colors.indigo,
     colorScheme: ColorScheme.light(
       primary: Colors.indigo,

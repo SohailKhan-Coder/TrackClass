@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../../core/components/custom_card.dart';
 import '../../../providers/db_provider.dart';
@@ -35,10 +36,11 @@ class _StatisticsTabState extends State<StatisticsTab> {
           builder: (context, provider, child) {
             return Column(
               children: [
-                const SizedBox(height: 10),
-                const Text(
+                const SizedBox(height: 10,),
+                Text(
                   "Statistics & Numbers",
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                  style: GoogleFonts.abyssinicaSil(
+                      fontSize: 20, fontWeight: FontWeight.bold,color: Colors.indigo),
                 ),
                 const SizedBox(height: 8),
                 Row(
@@ -54,7 +56,7 @@ class _StatisticsTabState extends State<StatisticsTab> {
                           : "Yearly Overview",
                       style: const TextStyle(
                         fontSize: 15,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.bold
                       ),
                     ),
                     DropdownButton<String>(

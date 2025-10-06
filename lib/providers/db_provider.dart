@@ -7,11 +7,10 @@ import '../models/attendance_model.dart';
 import '../services/db_helper.dart';
 
 class DBProvider with ChangeNotifier {
-  // ------------------- DB Helper -------------------
   final DBHelper _dbHelper = DBHelper();
-  DBHelper get dbHelper => _dbHelper; // <-- Add getter for BackupRestoreService
+  DBHelper get dbHelper => _dbHelper;
 
-  // ------------------- State -------------------
+
   List<Section> _sections = [];
   List<Student> _students = [];
   List<Attendance> _dailyAttendance = [];
@@ -19,7 +18,7 @@ class DBProvider with ChangeNotifier {
   int? _currentSectionId;
   DateTime _selectedDate = DateTime.now();
 
-  // ------------------- Getters -------------------
+
   List<Section> get sections => _sections;
   List<Student> get students => _students;
   int? get currentSectionId => _currentSectionId;
@@ -29,9 +28,7 @@ class DBProvider with ChangeNotifier {
   String get selectedDateString =>
       DateFormat('yyyy-MM-dd').format(_selectedDate);
 
-  // =========================
-  // SECTION & STUDENT MANAGEMENT
-  // =========================
+
 
   Future<void> initializeSections() async {
     _sections = await _dbHelper.getSections();
@@ -100,18 +97,18 @@ class DBProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // ====================
-  // DATE MANAGEMENT
-  // ====================
+
+  //Date Managements
+
   Future<void> setDate(DateTime date) async {
     _selectedDate = date;
     await loadAttendanceForDate();
     notifyListeners();
   }
 
-  // =========================
-  // ATTENDANCE MANAGEMENT
-  // =========================
+
+  // Attendance managements
+
   Future<void> loadAllAttendance() async {
     if (_currentSectionId == null) return;
     _allAttendance = await _dbHelper.getAttendanceBySection(_currentSectionId!);
@@ -176,9 +173,6 @@ class DBProvider with ChangeNotifier {
       _toggleField(studentId, 'manzil', value);
   void toggleRevision(int studentId, bool value) =>
       _toggleField(studentId, 'revision', value);
-// ============================
-  // FILTER & STATS HELPERS
-  // ============================
 
   List<String> getStudentsByFieldInPeriod(String field, String period) {
     DateTime now = DateTime.now();
@@ -286,9 +280,8 @@ class DBProvider with ChangeNotifier {
 
     return missing;
   }
-  // =========================
-  // LESSON DETAILS
-  // =========================
+  // Lesson Details
+
   Future<bool> saveLessonDetails(
       int studentId, String details, String columnName) async {
     try {
@@ -339,9 +332,6 @@ class DBProvider with ChangeNotifier {
     }
   }
 
-  // =========================
-  // ATTENDANCE HELPERS
-  // =========================
   Future<List<Attendance>> fetchAttendanceForStudent(int studentId,
       [DateTime? date]) async {
     final String? dateStr =
@@ -427,9 +417,9 @@ class DBProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // =========================
-  // SHARED PREFS
-  // =========================
+
+
+
   Future<void> _saveCurrentSectionId() async {
     final prefs = await SharedPreferences.getInstance();
     if (_currentSectionId != null) {
@@ -442,27 +432,24 @@ class DBProvider with ChangeNotifier {
     _currentSectionId = prefs.getInt('currentSectionId');
   }
 
-  /// Backwards-compatible loader: loads sections and then refreshes students/attendance
   Future<void> loadSections() async {
     _sections = await _dbHelper.getSections();
 
-    // If currentSectionId is missing or no longer present, pick the first section
     final hasCurrent = _currentSectionId != null && _sections.any((s) => s.id == _currentSectionId);
     if (!hasCurrent && _sections.isNotEmpty) {
       _currentSectionId = _sections.first.id;
       await _saveCurrentSectionId();
     }
 
-    // Refresh dependent state
+
     await loadStudentsForCurrentSection();
     await loadAttendanceForDate();
     await loadAllAttendance();
     notifyListeners();
   }
 
-  /// Preferred method to fully reload app data after restore
+
   Future<void> reloadAllData() async {
-    // initializeSections already handles creating default sections and loads students/attendance
     await initializeSections();
     notifyListeners();
   }

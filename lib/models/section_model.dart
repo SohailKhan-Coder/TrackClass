@@ -7,7 +7,6 @@ class Section {
   Map<String, dynamic> toMap() {
     return {
       'name': name,
-      // Do not include 'id' when inserting; let SQLite handle it
     };
   }
 
